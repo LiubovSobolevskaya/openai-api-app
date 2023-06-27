@@ -11,7 +11,6 @@ const Editor = ({ type }) => {
     const localData = localStorage.getItem(type);
     function onBlur() {
         const text = localStorage.getItem(type)
-        console.log(text);
         switch (type) {
             case 'javascript':
                 putJavaScriptDb(text);
@@ -30,29 +29,23 @@ const Editor = ({ type }) => {
         }
     }
     function onChange(e) {
-        console.log(e);
-        //setValue(e);
-        //console.log(value);
         localStorage.setItem(type, e);
     }
     switch (type) {
         case 'javascript':
             getJavaScriptDb().then((data) => {
-                console.log(data);
                 console.info('Loaded data from javascript IndexedDB, injecting into editor');
                 setValue(data || localData || "");
             });
             break;
         case 'html':
             getHtmlDb().then((data) => {
-                console.log(data);
                 console.info('Loaded data from html IndexedDB, injecting into editor');
                 setValue(data || localData || "");
             });
             break;
         case 'css':
             getCssDb().then((data) => {
-                console.log(data);
                 console.info('Loaded data from css IndexedDB, injecting into editor');
                 setValue(data || localData || "");
             });

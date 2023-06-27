@@ -5,7 +5,6 @@ const initdb = async () => {
     try {
         const db = await openDB('editors', 1, {
             upgrade(db) {
-                console.log("I am here!!!")
                 if (!db.objectStoreNames.contains('htmlStore')) {
                     db.createObjectStore('htmlStore', { keyPath: 'id', autoIncrement: true });
                     console.log('htmlStore object store created');
@@ -27,7 +26,6 @@ const initdb = async () => {
 };
 
 export const putHtmlDb = async (content) => {
-    console.log(content);
     try {
         const editorDb = await openDB('editors', 1);
         const tx = editorDb.transaction(['htmlStore'], 'readwrite');
@@ -72,7 +70,6 @@ export const getHtmlDb = async () => {
         const store = tx.objectStore('htmlStore');
         const request = store.getAll();
         const result = await request;
-        console.log('result', result);
         return result[0]?.value;
     } catch (error) {
         console.error('Error retrieving data from htmlStore:', error);
@@ -86,7 +83,6 @@ export const getCssDb = async () => {
         const store = tx.objectStore('cssStore');
         const request = store.getAll();
         const result = await request;
-        console.log('result', result);
         return result[0]?.value;
     } catch (error) {
         console.error('Error retrieving data from cssStore:', error);
@@ -100,7 +96,6 @@ export const getJavaScriptDb = async () => {
         const store = tx.objectStore('javaScriptStore');
         const request = store.getAll();
         const result = await request;
-        console.log('result', result);
         return result[0]?.value;
     } catch (error) {
         console.error('Error retrieving data from javaScriptStore:', error);

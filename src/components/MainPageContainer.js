@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import NavTabs from './NavTabs';
 //import Chat from './Chat';
 import Editor from './Editor';
+import Preview from './Preview';
 
 export default function MainPageContainer() {
     const [currentPage, setCurrentPage] = useState('HTML');
@@ -18,7 +19,9 @@ export default function MainPageContainer() {
             return <Editor type={'javascript'} />;
         }
         // If none of the above conditions match, render the About component
-        //return <Preview />;
+        if (currentPage === 'Preview') {
+            return <Preview />;
+        }
     };
     const handlePageChange = (page) => setCurrentPage(page);
 
