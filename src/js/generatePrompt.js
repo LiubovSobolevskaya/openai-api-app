@@ -11,8 +11,8 @@ async function generate(req, res) {
     const prompt = await generatePrompt(req);
     const params = {
         model: 'gpt-3.5-turbo',
-        max_tokens: 1000,
-        temperature: 0.9,
+        max_tokens: 2000,
+        temperature: 1,
         messages: [{ role: 'user', content: prompt }],
     };
 
@@ -30,23 +30,21 @@ async function generate(req, res) {
 
 async function generatePrompt(text) {
 
-    if (!text.includes('Hello') && !text.includes('hello')) {
-        const valueJavaScript = await getJavaScriptDb();
-        const valueHtml = await getHtmlDb();
-        const valueCss = await getCssDb();
-        let prompt = `Given this `;
-        if (valueCss.trim().length) {
-            prompt += `css: ${valueCss} \n`;
-        }
-        if (valueHtml.trim().length) {
-            prompt += `html: ${valueHtml} \n`;
-        }
-        if (valueJavaScript.trim().length) {
-            prompt += `javascript: ${valueJavaScript} \n`;
-        }
-        return `${prompt} \n ${text}`;
+    const valueJavaScript = await getJavaScriptDb();
+    const valueHtml = await getHtmlDb();
+    const valueCss = await getCssDb();
+    let prompt = '';
+    if (valueCss.trim().length) {
+        prompt += `css: ${valueCss} \n`;
     }
-    else return text;
+    if (valueHtml.trim().length) {
+        prompt += `html: ${valueHtml} \n`;
+    }
+    if (valueJavaScript.trim().length) {
+        prompt += `javascript: ${valueJavaScript} \n`;
+    }
+    return `${prompt} \n ${text}. \n Every piece of code wrap into three backtick and add the type of file it should be added to. Always include code that is not being changed. NEVER add <!DOCTYPE html> <html>,<head>, and <body>. Just what goes inside the body! Do not put <style> and <script> inside html file.`;
+
 }
 
 
