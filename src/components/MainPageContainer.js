@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import NavTabs from './NavTabs';
-//import Chat from './Chat';
+import MessageFeed from './Chat';
 import Editor from './Editor';
 import Preview from './Preview';
 
@@ -26,10 +26,15 @@ export default function MainPageContainer() {
     const handlePageChange = (page) => setCurrentPage(page);
 
     return (
-        <div>
-            <NavTabs currentPage={currentPage} handlePageChange={handlePageChange} />
-            <div>{renderPage()}</div>
-            {/* <Chat /> */}
+        <div >
+            <div>
+                <NavTabs currentPage={currentPage} handlePageChange={handlePageChange} />
+                <div>{renderPage()}</div>
+            </div>
+            <div style={{ float: "right", position: "absolute", top: 0, right: 0, height: "100%", width: "20%" }}>
+                <MessageFeed />
+            </div>
+
         </div>
     );
 }

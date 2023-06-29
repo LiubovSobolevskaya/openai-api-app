@@ -12,20 +12,48 @@ import {
 
 const MessageFeed = () => {
     const [messages, setMessages] = useState([]);
+    const [inputValue, setInputValue] = useState("");
 
-    return <div style={{ position: "relative", height: "500px" }}>
+    useEffect(() => {
+        // If the last message was sent by the user, simulate a reply
+        if (messages.length && messages[messages.length - 1].sender === "You") {
+            setTimeout(() => {
+                setMessages([...messages, { message: "This is an automated reply", sentTime: "just now", sender: "ChatGPT", direction: "incoming" }]);
+            }, 1000); // Wait for 1 second before adding reply
+        }
+    }, [messages]);
+
+
+
+    const handleInputChange = (e) => {
+        console.log(e);
+        setInputValue(e);
+    };
+
+    const handleSend = () => {
+        if (inputValue.trim() !== "") {
+            // Adding the new message to the list of messages
+            setMessages([...messages, { message: inputValue, sender: "You", direction: "outgoing" }]);
+            // Clearing the input value
+            setInputValue("");
+        }
+    };
+
+    return <div style={{ position: "relative", height: "100%", width: "100%" }}>
         <MainContainer>
             <ChatContainer>
                 <MessageList>
-                    {messages.map((message) => (
-                        <Message key={message.id} model={{
-                            message: "Hello my friend",
-                        }} />
+                    {messages.map((msg, index) => (
+                        <Message key={index} model={msg} />
                     ))}
                 </MessageList>
-                <MessageInput placeholder="Type message here" />
+                <MessageInput
+                    placeholder="Type message here"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    onSend={handleSend} />
             </ChatContainer>
         </MainContainer>
-    </div>;
+    </div >;
 }
 export default MessageFeed;
