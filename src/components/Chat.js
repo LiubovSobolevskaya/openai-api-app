@@ -1,4 +1,6 @@
 import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+import { putHtmlDb, putCssDb, putJavaScriptDb } from '../js/database';
+import generate from '../js/generatePrompt';
 import React, { useEffect, useState } from "react";
 
 import {
@@ -15,12 +17,16 @@ const MessageFeed = () => {
     const [inputValue, setInputValue] = useState("");
 
     useEffect(() => {
-        // If the last message was sent by the user, simulate a reply
-        if (messages.length && messages[messages.length - 1].sender === "You") {
-            setTimeout(() => {
-                setMessages([...messages, { message: "This is an automated reply", sentTime: "just now", sender: "ChatGPT", direction: "incoming" }]);
-            }, 1000); // Wait for 1 second before adding reply
-        }
+        const fetchResponse = async () => {
+            // If the last message was sent by the user, simulate a reply
+            if (messages.length && messages[messages.length - 1].sender === "You") {
+                const chatGPTResponse = await generate(messages[messages.length - 1].message);
+                console.log(chatGPTResponse);
+                setMessages([...messages, { message: chatGPTResponse, sentTime: "just now", sender: "Bot", direction: "incoming" }]);
+            }
+        };
+
+        fetchResponse();
     }, [messages]);
 
 
