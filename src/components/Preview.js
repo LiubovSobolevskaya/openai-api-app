@@ -1,39 +1,42 @@
 import React from "react";
 import { getHtmlDb, getCssDb, getJavaScriptDb } from '../js/database';
+import { connect } from 'react-redux';
+import { setHTMLData, setCSSData, setJSData } from '../js/actionCreators';
 
-export default class Preview extends React.Component {
-    hasMounted = false;
+
+class Preview extends React.Component {
+
     async componentDidMount() {
-        if (this.hasMounted) return;
-        this.hasMounted = true;
 
         try {
-            this.instance.script = null;
-            this.instance.div = null;
-            this.instance.style = null;
+            // this.instance.script = null;
+            // this.instance.div = null;
+            // this.instance.style = null;
 
-
-
-            console.log("I am being mounted!");
             const valueJavaScript = await getJavaScriptDb();
             const valueHtml = await getHtmlDb();
             const valueCss = await getCssDb();
-            console.info('Loaded data from IndexedDB');
+
+            this.props.setHTMLData(valueHtml);
+            this.props.setCSSData(valueCss);
+            this.props.setJSData(valueJavaScript);
+
+            while (this.instance.firstChild) {
+                this.instance.removeChild(this.instance.firstChild);
+            }
+
+
 
             // Append CSS
             const style = document.createElement('style');
             style.type = 'text/css';
             style.innerHTML = valueCss;
             this.instance.appendChild(style);
-
             // Append HTML
 
             const div = document.createElement('div');
             div.innerHTML = valueHtml;
             this.instance.appendChild(div);
-
-
-            // Append JavaScript
 
             // Append JavaScript
             const script = document.createElement('script');
@@ -49,7 +52,61 @@ export default class Preview extends React.Component {
         }
     }
 
+    componentDidUpdate(prevProps) {
+        if (
+            prevProps.htmlData !== this.props.htmlData ||
+            prevProps.cssData !== this.props.cssData ||
+            prevProps.jsData !== this.props.jsData
+        ) {
+            this.updateContent();
+        }
+    }
+
+    updateContent() {
+        while (this.instance.firstChild) {
+            this.instance.removeChild(this.instance.firstChild);
+        }
+
+        // this.instance.script = null;
+        // this.instance.div = null;
+        // this.instance.style = null;
+
+        // Append CSS
+        const style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerHTML = this.props.cssData;
+        this.instance.appendChild(style);
+        // Append HTML
+
+        const div = document.createElement('div');
+        div.innerHTML = this.props.htmlData;
+        this.instance.appendChild(div);
+
+        // Append JavaScript
+        const script = document.createElement('script');
+        script.id = 'my-script'; // Assigning an ID to the script element
+        script.type = 'text/javascript';
+        script.innerHTML = `(function() { ${this.props.jsData} })();`;
+        this.instance.appendChild(script);
+
+    }
+
     render() {
         return <div ref={el => (this.instance = el)} />;
     }
 }
+
+const mapStateToProps = state => ({
+    htmlData: state.htmlData,
+    cssData: state.cssData,
+    jsData: state.jsData
+});
+
+const mapDispatchToProps = dispatch => ({
+    setHTMLData: (data) => dispatch(setHTMLData(data)),
+    setCSSData: (data) => dispatch(setCSSData(data)),
+    setJSData: (data) => dispatch(setJSData(data)),
+});
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Preview);

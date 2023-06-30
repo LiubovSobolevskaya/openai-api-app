@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import NavTabs from './NavTabs';
 import MessageFeed from './Chat';
 import Editor from './Editor';
@@ -35,6 +36,6 @@ export default function MainPageContainer() {
                 <MessageFeed />
             </div>
 
-        </div>
+        </div >
     );
 }

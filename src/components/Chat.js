@@ -1,8 +1,13 @@
 import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import { putHtmlDb, putCssDb, putJavaScriptDb } from '../js/database';
+import {
+    SET_HTML_DATA,
+    SET_CSS_DATA,
+    SET_JS_DATA
+} from "../js/actions";
 import generate from '../js/generatePrompt';
 import React, { useEffect, useState } from "react";
-
+import { useSelector, useDispatch } from 'react-redux';
 import {
     MainContainer,
     ChatContainer,
@@ -15,103 +20,137 @@ import {
 const MessageFeed = () => {
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState("");
-
+    const dispatch = useDispatch();
     useEffect(() => {
         const fetchResponse = async () => {
             // If the last message was sent by the user, simulate a reply
             if (messages.length && messages[messages.length - 1].sender === "You") {
                 const chatGPTResponse = await generate(messages[messages.length - 1].message);
                 console.log(chatGPTResponse);
-                const codeparts = chatGPTResponse.split('```');
+                let codeparts;
+                if (chatGPTResponse.includes('~~~')) {
+                    codeparts = chatGPTResponse.split('~~~');
+                }
+                else {
+                    codeparts = chatGPTResponse.split('```');
+                }
                 if (codeparts.length === 1) {
                     setMessages([...messages, { message: codeparts[0], sentTime: "just now", sender: "Bot", direction: "incoming" }]);
                     return;
                 }
-                codeparts.forEach(element => {
-                    element = element.trim();
-                    if (element.includes('javascript') && element.slice(0, 10) === 'javascript') {
-                        element = element.substring(10);
-                        putJavaScriptDb(element);
-                        console.log('Added to javascript');
-                        localStorage.setItem('javascript', element);
+                let i = 0;
+                while (i < codeparts.length) {
+                    let element = codeparts[i];
+                    let processedElement = element.trim();
+                    if (processedElement.toLowerCase().includes('html') && !processedElement.toLowerCase().includes('<')) {
+                        i++;
+                        if (codeparts[i]) {
+                            processedElement = codeparts[i].trim();
+                            if (processedElement.toLowerCase().includes('html') && processedElement.toLowerCase().slice(0, 4) === 'html') {
+                                processedElement = processedElement.substring(5);
+                            }
+                            if (processedElement.includes('<body>')) {
+                                processedElement = processedElement.split('<body>')[1].split('</body>')[0]
+                            }
+                            dispatch({
+                                type: SET_HTML_DATA,
+                                payload: processedElement,
+                            });
+                            putHtmlDb(processedElement);
+                            console.log('Added to html');
+                            localStorage.setItem('html', processedElement);
+                        }
+
                     }
-                    else if (element.includes('css') && element.slice(0, 3) === 'css') {
-                        element = element.substring(3);
-                        putCssDb(element);
-                        console.log('Added to css');
-                        localStorage.setItem('css', element);
-                    }
-                    else if (element.includes('html') && element.slice(0, 4) === 'html') {
-                        element = element.substring(4);
-                        if (element.includes('<script>')) {
-                            const scriptPart = element.split('<script>')[1].split('</script>')[0];
+                    else if (processedElement.toLowerCase().includes('html') && processedElement.toLowerCase().slice(0, 4) === 'html') {
+                        processedElement = processedElement.substring(5);
+                        if (processedElement.includes('<script>')) {
+                            const scriptPart = processedElement.split('<script>')[1].split('</script>')[0];
                             if (scriptPart.includes('src')) {
-                                element = element.split('<script>')[0] + element.split('</script>')[1]
+                                processedElement = processedElement.split('<script>')[0] + processedElement.split('</script>')[1]
                             }
                         }
-                        // if (element.includes('<style>')) {
-                        //     const part = element.split('<style>')[1];
-                        //     const words = part.split(' ');
-                        //     let word = words[0];
-                        //     let save = [word];
-                        //     let i = 0;
-                        //     while (word !== '</style>') {
-                        //         i++;
-                        //         word = words[i]
-                        //         save.push(word);
-                        //     }
-                        //     putCssDb(save.join(" "));
-                        //     console.log('Added to css');
-                        //     localStorage.setItem('css', save.join(" "));
-                        // }
-                        // if (element.includes('<script>')) {
-                        //     const part = element.split('<script>')[1].split('</script>')[0];
-                        //     console.log(part);
-                        //     const words = part.split(' ');
-                        //     console.log(words);
-                        //     let word = words[0];
-                        //     let save = [word];
-                        //     let i = 0;
-                        //     while (word !== '</script>') {
-                        //         i++;
-                        //         word = words[i]
-                        //         save.push(word);
-                        //     }
-                        //     console.log(save.join(" "));
-                        //     putJavaScriptDb(save.join(" "));
-                        //     console.log('Added to JavaScript');
-                        //     localStorage.setItem('javascript', save.join(" "));
-                        // }
-                        // if (element.includes('<body>')) {
-                        //     const part = element.split('<body>')[1];
-                        //     const words = part.split(' ');
-                        //     let word = words[0];
-                        //     let save = [word];
-                        //     let i = 0;
-                        //     while (word !== '</body>' || word !== '</script>') {
-                        //         i++;
-                        //         word = words[i]
-                        //         save.push(word);
-                        //     }
-                        //     putHtmlDb(save.join(" "));
-                        //     console.log('Added to Html');
-                        //     localStorage.setItem('html', element);
-
-
-                        // }
-                        // else {
-                        if (element.trim().length) {
-                            putHtmlDb(element);
+                        if (processedElement.includes('<body>')) {
+                            processedElement = processedElement.split('<body>')[1].split('</body>')[0]
                         }
-                        console.log('Added to html');
-                        localStorage.setItem('html', element);
+
+
+                        if (processedElement.trim().length) {
+                            dispatch({
+                                type: SET_HTML_DATA,
+                                payload: processedElement,
+                            });
+                            putHtmlDb(processedElement);
+                            console.log('Added to html');
+                            localStorage.setItem('html', processedElement);
+
+                        }
+
 
                     }
+                    else if (processedElement.toLowerCase().includes('css') && !processedElement.toLowerCase().includes('font-size')) {
+                        i++;
+                        if (codeparts[i]) {
+                            processedElement = codeparts[i].trim();
+                            if (processedElement.toLowerCase().includes('css') && processedElement.toLowerCase().slice(0, 3) === 'css') {
+                                processedElement = processedElement.substring(4);
+                            }
+                            dispatch({
+                                type: SET_CSS_DATA,
+                                payload: processedElement,
+                            });
+                            putCssDb(processedElement);
+                            console.log('Added to css');
+                            localStorage.setItem('css', processedElement);
+                        }
+
+                    }
+                    else if (processedElement.toLowerCase().includes('css') && processedElement.toLowerCase().slice(0, 3) === 'css') {
+                        processedElement = processedElement.substring(4);
+                        dispatch({
+                            type: SET_CSS_DATA,
+                            payload: processedElement,
+                        });
+                        putCssDb(processedElement);
+                        console.log('Added to css');
+                        localStorage.setItem('css', processedElement);
+
+                    }
+                    else if (processedElement.toLowerCase().includes('javascript') && !processedElement.toLowerCase().includes('return')) {
+                        i++;
+                        if (codeparts[i]) {
+                            processedElement = codeparts[i].trim();
+                            if (processedElement.toLowerCase().includes('javascript') && processedElement.toLowerCase().slice(0, 10) === 'javascript') {
+                                processedElement = processedElement.substring(11);
+                            }
+                            dispatch({
+                                type: SET_JS_DATA,
+                                payload: processedElement,
+                            });
+                            putJavaScriptDb(processedElement);
+                            console.log('Added to javascript');
+                            localStorage.setItem('javascript', processedElement);
+                        }
+
+                    }
+                    else if (processedElement.toLowerCase().includes('javascript') && processedElement.toLowerCase().slice(0, 10) === 'javascript') {
+                        processedElement = processedElement.substring(10);
+                        dispatch({
+                            type: SET_JS_DATA,
+                            payload: processedElement,
+                        });
+                        putJavaScriptDb(processedElement);
+                        console.log('Added to javascript');
+                        localStorage.setItem('javascript', processedElement);
+
+                    }
+
                     else {
                         setMessages([...messages, { message: codeparts[0], sentTime: "just now", sender: "Bot", direction: "incoming" }]);
                     }
+                    i++;
 
-                });
+                }
 
 
             }

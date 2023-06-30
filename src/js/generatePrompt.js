@@ -1,10 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
 import { getHtmlDb, getCssDb, getJavaScriptDb } from './database';
 import axios from 'axios';
-const configuration = new Configuration({
-    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-});
-
 
 async function generate(req, res) {
 
@@ -43,7 +39,45 @@ async function generatePrompt(text) {
     if (valueJavaScript.trim().length) {
         prompt += `javascript: ${valueJavaScript} \n`;
     }
-    return `${prompt} \n ${text}. \n Every piece of code wrap into three backtick and add the type of file it should be added to. Always include code that is not being changed. NEVER add <!DOCTYPE html> <html>,<head>, and <body>. Just what goes inside the body! Do not put <style> and <script> inside html file.`;
+    return `${prompt} \n ${text}. \n Every piece of code wrap into  ~~~ and add the type of file it should be added to. 
+    Always include code that is not being changed. 
+    NEVER add <!DOCTYPE html> <html>,<head>, and <body> to the html. 
+    Only add what goes inside the body! NEVER put <style> and <script> inside html file. NEVER add <!DOCTYPE html> <html>,<head>, and <body> to the html.
+    Always separate html, css and js files. 
+    Never keep them in the same place! NEVER add <!DOCTYPE html> <html>,<head>, and <body> to the html 
+    
+    here is the example of the responce: Sure. here is the result.
+    ~~~
+    css
+    h1 {
+        font-size: 40px;
+        margin-top: 50px;
+    }
+    ~~~
+    ~~~
+    javascript
+    document.getElementById("clickButton").addEventListener("click", function() {
+        let randomColor = getRandomColor();
+        document.querySelector("h1").style.color = randomColor;
+    });
+    
+    function getRandomColor() {
+      ...
+        return color;
+    }
+    ~~~
+    ~~~
+    html
+    <h1>My Title</h1>
+    <button>Button</button>
+    ~~~
+    DO NOT ADD <!DOCTYPE html>
+    <html>
+    <head>
+     ///
+    </head>
+    <body>
+    `;
 
 }
 
