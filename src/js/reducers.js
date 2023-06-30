@@ -8,7 +8,8 @@ import { useReducer } from "react";
 const initialState = {
     htmlData: "",
     cssData: "",
-    jsData: ""
+    jsData: "",
+    isMessageSent: false,
 };
 
 const contentReducer = (state = initialState, action) => {
@@ -20,6 +21,8 @@ const contentReducer = (state = initialState, action) => {
             return { ...state, cssData: action.payload };
         case 'SET_JS_DATA':
             return { ...state, jsData: action.payload };
+        case 'MESSAGE_SENT':
+            return { ...state, isMessageSent: action.payload };
         default:
             return state;
     }

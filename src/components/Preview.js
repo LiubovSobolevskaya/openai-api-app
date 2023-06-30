@@ -1,8 +1,8 @@
 import React from "react";
 import { getHtmlDb, getCssDb, getJavaScriptDb } from '../js/database';
 import { connect } from 'react-redux';
-import { setHTMLData, setCSSData, setJSData } from '../js/actionCreators';
-
+import { setHTMLData, setCSSData, setJSData, MessageSent } from '../js/actionCreators';
+import Loader from './assets/loader.css';
 
 class Preview extends React.Component {
 
@@ -24,8 +24,6 @@ class Preview extends React.Component {
             while (this.instance.firstChild) {
                 this.instance.removeChild(this.instance.firstChild);
             }
-
-
 
             // Append CSS
             const style = document.createElement('style');
@@ -62,14 +60,12 @@ class Preview extends React.Component {
         }
     }
 
+
+
     updateContent() {
         while (this.instance.firstChild) {
             this.instance.removeChild(this.instance.firstChild);
         }
-
-        // this.instance.script = null;
-        // this.instance.div = null;
-        // this.instance.style = null;
 
         // Append CSS
         const style = document.createElement('style');
@@ -92,20 +88,34 @@ class Preview extends React.Component {
     }
 
     render() {
-        return <div ref={el => (this.instance = el)} />;
+        const isLoading = this.props.isMessageSent;
+
+        return (
+            <div style={{ position: 'relative' }}>
+                <div ref={el => (this.instance = el)}></div>
+
+                {isLoading ? (
+                    <div className="loader-container">
+                        <div className="spinner"></div>
+                    </div>
+                ) : null}
+            </div>
+        );
     }
 }
 
 const mapStateToProps = state => ({
     htmlData: state.htmlData,
     cssData: state.cssData,
-    jsData: state.jsData
+    jsData: state.jsData,
+    isMessageSent: state.isMessageSent
 });
 
 const mapDispatchToProps = dispatch => ({
     setHTMLData: (data) => dispatch(setHTMLData(data)),
     setCSSData: (data) => dispatch(setCSSData(data)),
     setJSData: (data) => dispatch(setJSData(data)),
+    MessageSent: (data) => dispatch(MessageSent(data)),
 });
 
 

@@ -1,5 +1,5 @@
 // actionCreators.js
-import { SET_HTML_DATA, SET_CSS_DATA, SET_JS_DATA } from './actions';
+import { SET_HTML_DATA, SET_CSS_DATA, SET_JS_DATA, MESSAGE_SENT } from './actions';
 
 export const setHTMLData = data => ({
     type: SET_HTML_DATA,
@@ -15,3 +15,9 @@ export const setJSData = data => ({
     type: SET_JS_DATA,
     payload: data
 });
+
+export const MessageSent = data => ({
+    type: MESSAGE_SENT,
+    payload: data
+});
+

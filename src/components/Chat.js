@@ -3,7 +3,8 @@ import { putHtmlDb, putCssDb, putJavaScriptDb } from '../js/database';
 import {
     SET_HTML_DATA,
     SET_CSS_DATA,
-    SET_JS_DATA
+    SET_JS_DATA,
+    MESSAGE_SENT,
 } from "../js/actions";
 import generate from '../js/generatePrompt';
 import React, { useEffect, useState } from "react";
@@ -151,6 +152,10 @@ const MessageFeed = () => {
                     i++;
 
                 }
+                dispatch({
+                    type: MESSAGE_SENT,
+                    payload: false,
+                });
 
 
             }
@@ -172,6 +177,10 @@ const MessageFeed = () => {
             // Clearing the input value
             setInputValue("");
         }
+        dispatch({
+            type: MESSAGE_SENT,
+            payload: true,
+        });
     };
 
     return <div style={{ position: "relative", height: "100%", width: "100%" }}>

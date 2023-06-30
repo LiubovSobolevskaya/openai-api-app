@@ -6,7 +6,7 @@ import Editor from './Editor';
 import Preview from './Preview';
 
 export default function MainPageContainer() {
-    const [currentPage, setCurrentPage] = useState('HTML');
+    const [currentPage, setCurrentPage] = useState('Preview');
 
     const renderPage = () => {
         // Check the value of currentPage and render the corresponding component
@@ -27,15 +27,17 @@ export default function MainPageContainer() {
     const handlePageChange = (page) => setCurrentPage(page);
 
     return (
-        <div >
-            <div>
-                <NavTabs currentPage={currentPage} handlePageChange={handlePageChange} />
-                <div>{renderPage()}</div>
-            </div>
-            <div style={{ float: "right", position: "absolute", top: 0, right: 0, height: "100%", width: "20%" }}>
-                <MessageFeed />
-            </div>
+        <div>
+            <NavTabs currentPage={currentPage} handlePageChange={handlePageChange} />
+            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
 
+
+                <div style={{ flex: 1, minWidth: '80%' }}>{renderPage()}</div>
+
+                <div style={{ flex: 1, minWidth: '20%', maxWidth: '20%', minHeight: '100%' }}>
+                    <MessageFeed />
+                </div>
+            </div>
         </div >
     );
 }
