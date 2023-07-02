@@ -28,17 +28,74 @@ const MessageFeed = () => {
             if (messages.length && messages[messages.length - 1].sender === "You") {
                 const chatGPTResponse = await generate(messages[messages.length - 1].message);
                 console.log(chatGPTResponse);
-                let codeparts;
-                if (chatGPTResponse.includes('~~~')) {
-                    codeparts = chatGPTResponse.split('~~~');
+                if (chatGPTResponse.includes('<!DOCTYPE html>')) {
+                    let processedElement = chatGPTResponse.trim();
+                    if (processedElement.includes('html')) {
+                        if (processedElement.includes('<style>')) {
+                            const styling = processedElement.split('<style>')[1].split('</style>')[0];
+                            dispatch({
+                                type: SET_CSS_DATA,
+                                payload: styling,
+                            });
+                            putCssDb(styling);
+                            console.log('Added to css');
+                            localStorage.setItem('css', styling);
+                        }
+                        if (processedElement.includes('<script>')) {
+                            const script = processedElement.split('<script>')[1].split('</script>')[0];
+                            if (!script.includes('src')) {
+                                dispatch({
+                                    type: SET_JS_DATA,
+                                    payload: script,
+                                });
+                                putCssDb(script);
+                                console.log('Added to javaScript');
+                                localStorage.setItem('javascript', script);
+                            }
+                        }
+                        if (processedElement.includes('<body>')) {
+                            let body = processedElement.split('<body>')[1].split('</body>')[0];
+                            if (body.includes('<script>')) {
+                                body = body.split('<script>')[0] + body.split('</script>')[1];
+                            }
+                            if (body.includes('<div id="container">')) {
+                                body = body.split('<div id="container">')[1];
+                                body = body.substring(0, body.length - 6);
+                            }
+                            if (body.slice(0, 5) === '<div>') {
+                                body = body.substring(5, body.length - 6);
+                            }
+
+                            dispatch({
+                                type: SET_HTML_DATA,
+                                payload: body,
+                            });
+                            putHtmlDb(body);
+                            console.log('Added to html');
+                            localStorage.setItem('html', body);
+                        }
+                        setMessages([...messages, { message: "Sure.", sentTime: "just now", sender: "Bot", direction: "incoming" }]);
+                        dispatch({
+                            type: MESSAGE_SENT,
+                            payload: false,
+                        });
+                        return;
+                    }
                 }
-                else {
+                let codeparts;
+                if (chatGPTResponse.includes('```')) {
                     codeparts = chatGPTResponse.split('```');
                 }
                 if (codeparts.length === 1) {
                     setMessages([...messages, { message: codeparts[0], sentTime: "just now", sender: "Bot", direction: "incoming" }]);
+                    dispatch({
+                        type: MESSAGE_SENT,
+                        payload: false,
+                    });
+
                     return;
                 }
+
                 let i = 0;
                 while (i < codeparts.length) {
                     let element = codeparts[i];

@@ -2,6 +2,31 @@ import { Configuration, OpenAIApi } from "openai";
 import { getHtmlDb, getCssDb, getJavaScriptDb } from './database';
 import axios from 'axios';
 
+var returnFormat = `Return code in the following format
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Sample Page</title>
+    
+    <!-- Internal CSS for styling -->
+    <style>
+       
+    </style>
+</head>
+
+<body>
+   
+    <!-- Internal JavaScript -->
+    <script>
+      
+    </script>
+</body>
+
+</html>`
 async function generate(req, res) {
 
     const prompt = await generatePrompt(req);
@@ -29,55 +54,41 @@ async function generatePrompt(text) {
     const valueJavaScript = await getJavaScriptDb();
     const valueHtml = await getHtmlDb();
     const valueCss = await getCssDb();
-    let prompt = '';
-    if (valueCss.trim().length) {
-        prompt += `css: ${valueCss} \n`;
+    if (!valueHtml.trim().length && !valueCss.trim().length && !valueJavaScript.trim().length) {
+        return `${text}. ${returnFormat}`;
     }
-    if (valueHtml.trim().length) {
-        prompt += `html: ${valueHtml} \n`;
-    }
-    if (valueJavaScript.trim().length) {
-        prompt += `javascript: ${valueJavaScript} \n`;
-    }
-    return `${prompt} \n ${text}. \n Every piece of code wrap into  ~~~ and add the type of file it should be added to. 
-    Always include code that is not being changed. 
-    NEVER add <!DOCTYPE html> <html>,<head>, and <body> to the html. 
-    Only add what goes inside the body! NEVER put <style> and <script> inside html file. NEVER add <!DOCTYPE html> <html>,<head>, and <body> to the html.
-    Always separate html, css and js files. 
-    Never keep them in the same place! NEVER add <!DOCTYPE html> <html>,<head>, and <body> to the html 
+
+    let prompt = `<!DOCTYPE html>
+    <html lang="en">
     
-    here is the example of the responce: Sure. here is the result.
-    ~~~
-    css
-    h1 {
-        font-size: 40px;
-        margin-top: 50px;
-    }
-    ~~~
-    ~~~
-    javascript
-    document.getElementById("clickButton").addEventListener("click", function() {
-        let randomColor = getRandomColor();
-        document.querySelector("h1").style.color = randomColor;
-    });
-    
-    function getRandomColor() {
-      ...
-        return color;
-    }
-    ~~~
-    ~~~
-    html
-    <h1>My Title</h1>
-    <button>Button</button>
-    ~~~
-    DO NOT ADD <!DOCTYPE html>
-    <html>
     <head>
-     ///
-    </head>
-    <body>
-    `;
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>My Sample Page</title>`
+
+
+    if (valueCss.trim().length) {
+        prompt += `<style> ${valueCss} \n  </style>\n`;
+    }
+
+    prompt += `</head>`;
+    prompt += `<body>   
+    <div id="container" style={{ position: 'relative' }}>
+    <div> `
+    if (valueHtml.trim().length) {
+        prompt += `${valueHtml} \n`;
+    }
+    prompt += `</div> 
+               </div>`
+    if (valueJavaScript.trim().length) {
+        prompt += ` <script> ${valueJavaScript} \n </script>`;
+    }
+    prompt += `</body>`
+    prompt += `</html>
+    `
+
+    return `${prompt} \n ${text}. ${returnFormat}`;
 
 }
 

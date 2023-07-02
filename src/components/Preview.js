@@ -91,7 +91,7 @@ class Preview extends React.Component {
         const isLoading = this.props.isMessageSent;
 
         return (
-            <div style={{ position: 'relative' }}>
+            <div id="container">
                 <div ref={el => (this.instance = el)}></div>
 
                 {isLoading ? (
