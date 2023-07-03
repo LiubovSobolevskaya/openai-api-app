@@ -33,48 +33,58 @@ const MessageFeed = () => {
                     if (processedElement.includes('html')) {
                         if (processedElement.includes('<style>')) {
                             const styling = processedElement.split('<style>')[1].split('</style>')[0];
-                            dispatch({
-                                type: SET_CSS_DATA,
-                                payload: styling,
-                            });
-                            putCssDb(styling);
-                            console.log('Added to css');
-                            localStorage.setItem('css', styling);
+                            if (styling.trim().length) {
+                                dispatch({
+                                    type: SET_CSS_DATA,
+                                    payload: styling,
+                                });
+
+                                putCssDb(styling);
+                                console.log('Added to css');
+                                localStorage.setItem('css', styling);
+                            }
                         }
                         if (processedElement.includes('<script>')) {
                             const script = processedElement.split('<script>')[1].split('</script>')[0];
-                            if (!script.includes('src')) {
+                            if (!script.includes('src') && script.trim().length && !script.includes('onClick')) {
                                 dispatch({
                                     type: SET_JS_DATA,
                                     payload: script,
                                 });
-                                putCssDb(script);
+                                putJavaScriptDb(script);
                                 console.log('Added to javaScript');
                                 localStorage.setItem('javascript', script);
                             }
                         }
                         if (processedElement.includes('<body>')) {
                             let body = processedElement.split('<body>')[1].split('</body>')[0];
-                            if (body.includes('<script>')) {
+                            if (body.includes('<script>') && !body.includes('onClick')) {
                                 body = body.split('<script>')[0] + body.split('</script>')[1];
                             }
+
+
                             if (body.includes('<div id="container">')) {
                                 body = body.split('<div id="container">')[1];
-                                body = body.substring(0, body.length - 6);
+                                const bodyParts = body.split('</div>');
+                                bodyParts.pop();
+                                body = bodyParts.join('</div>');
                             }
                             if (body.slice(0, 5) === '<div>') {
                                 body = body.substring(5, body.length - 6);
                             }
+                            if (body.trim().length) {
 
-                            dispatch({
-                                type: SET_HTML_DATA,
-                                payload: body,
-                            });
-                            putHtmlDb(body);
-                            console.log('Added to html');
-                            localStorage.setItem('html', body);
+                                dispatch({
+                                    type: SET_HTML_DATA,
+                                    payload: body,
+                                });
+                                putHtmlDb(body);
+                                console.log('Added to html');
+                                localStorage.setItem('html', body);
+                            }
                         }
-                        setMessages([...messages, { message: "Sure.", sentTime: "just now", sender: "Bot", direction: "incoming" }]);
+                        const messageText = processedElement.split('```')[-1] || 'Sure.'
+                        setMessages([...messages, { message: messageText, sentTime: "just now", sender: "Bot", direction: "incoming" }]);
                         dispatch({
                             type: MESSAGE_SENT,
                             payload: false,

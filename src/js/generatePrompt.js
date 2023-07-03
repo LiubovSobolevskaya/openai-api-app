@@ -12,7 +12,6 @@ var returnFormat = `Return code in the following format
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Sample Page</title>
     
-    <!-- Internal CSS for styling -->
     <style>
        
     </style>
@@ -20,7 +19,6 @@ var returnFormat = `Return code in the following format
 
 <body>
    
-    <!-- Internal JavaScript -->
     <script>
       
     </script>
@@ -55,7 +53,7 @@ async function generatePrompt(text) {
     const valueHtml = await getHtmlDb();
     const valueCss = await getCssDb();
     if (!valueHtml.trim().length && !valueCss.trim().length && !valueJavaScript.trim().length) {
-        return `${text}. ${returnFormat}`;
+        return `$Given an empty web page: {text}. ${returnFormat}. Do not use onclick Events. Use eventlisteners instead!`;
     }
 
     let prompt = `<!DOCTYPE html>
@@ -74,8 +72,8 @@ async function generatePrompt(text) {
 
     prompt += `</head>`;
     prompt += `<body>   
-    <div id="container" style={{ position: 'relative' }}>
-    <div> `
+    <div id="container">
+    <div>`
     if (valueHtml.trim().length) {
         prompt += `${valueHtml} \n`;
     }
@@ -87,8 +85,8 @@ async function generatePrompt(text) {
     prompt += `</body>`
     prompt += `</html>
     `
-
-    return `${prompt} \n ${text}. ${returnFormat}`;
+    console.log(prompt);
+    return `${prompt} \n ${text}.${returnFormat}. Do not use onclick Events. Use eventlisteners instead! NO onclick`;
 
 }
 
