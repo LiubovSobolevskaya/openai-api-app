@@ -25,13 +25,15 @@ var returnFormat = `Return code in the following format
 </body>
 
 </html>`
+
+
 async function generate(req, res) {
 
     const prompt = await generatePrompt(req);
     const params = {
         model: 'gpt-3.5-turbo',
-        max_tokens: 2000,
-        temperature: 1,
+        max_tokens: 1000,
+        temperature: 0.99,
         messages: [{ role: 'user', content: prompt }],
     };
 
@@ -46,14 +48,13 @@ async function generate(req, res) {
         console.log(err);
     }
 }
-
 async function generatePrompt(text) {
 
     const valueJavaScript = await getJavaScriptDb();
     const valueHtml = await getHtmlDb();
     const valueCss = await getCssDb();
     if (!valueHtml.trim().length && !valueCss.trim().length && !valueJavaScript.trim().length) {
-        return `$Given an empty web page: {text}. ${returnFormat}. Do not use onclick Events. Use eventlisteners instead!`;
+        return `$Given an empty web page: {text}. ${returnFormat}. Do not create elements dynamically using javascript. Add them to html part!. Avoid using onClick() events. Use event listeners  instead!`;
     }
 
     let prompt = `<!DOCTYPE html>
@@ -86,7 +87,7 @@ async function generatePrompt(text) {
     prompt += `</html>
     `
     console.log(prompt);
-    return `${prompt} \n ${text}.${returnFormat}. Do not use onclick Events. Use eventlisteners instead! NO onclick`;
+    return `${prompt} \n ${text}.${returnFormat}. Do not create or update elements dynamically using javascript. Add or change them them to html part! Do not use Onclick events. Use events listeners instead!`;
 
 }
 

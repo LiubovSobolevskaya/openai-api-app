@@ -64,7 +64,9 @@ const MessageFeed = () => {
 
 
                             if (body.includes('<div id="container">')) {
+
                                 body = body.split('<div id="container">')[1];
+                                console.log(body);
                                 const bodyParts = body.split('</div>');
                                 bodyParts.pop();
                                 body = bodyParts.join('</div>');

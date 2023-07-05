@@ -32,9 +32,9 @@ export default function MainPageContainer() {
             <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
 
 
-                <div style={{ flex: 1, minWidth: '80%', minHeight: '100vh' }}>{renderPage()}</div>
+                <div style={{ flex: 1, minWidth: '80%', height: '100vh', overflow: "hidden" }}>{renderPage()}</div>
 
-                <div style={{ flex: 1, minWidth: '20%', maxWidth: '20%', minHeight: '100vh' }}>
+                <div style={{ flex: 1, minWidth: '20%', maxWidth: '20%', height: '95vh', overflow: "auto" }}>
                     <MessageFeed />
                 </div>
             </div>
