@@ -32,13 +32,17 @@ const MessageFeed = () => {
                     let processedElement = chatGPTResponse.trim();
                     if (processedElement.includes('html')) {
                         if (processedElement.includes('<style>')) {
-                            const styling = processedElement.split('<style>')[1].split('</style>')[0];
+                            let styling = processedElement.split('<style>')[1].split('</style>')[0];
+                            if (styling.includes('body')) {
+                                // const pattern = /body\s*\{([^}]+)\}/g;
+                                // const matches = styling.match(pattern);
+                                styling = styling.replace('body', '#container');
+                            }
                             if (styling.trim().length) {
                                 dispatch({
                                     type: SET_CSS_DATA,
                                     payload: styling,
                                 });
-
                                 putCssDb(styling);
                                 console.log('Added to css');
                                 localStorage.setItem('css', styling);
@@ -75,7 +79,6 @@ const MessageFeed = () => {
                                 body = body.substring(5, body.length - 6);
                             }
                             if (body.trim().length) {
-
                                 dispatch({
                                     type: SET_HTML_DATA,
                                     payload: body,
@@ -85,7 +88,16 @@ const MessageFeed = () => {
                                 localStorage.setItem('html', body);
                             }
                         }
-                        const messageText = processedElement.split('```')[-1] || 'Sure.'
+                        let messageText = processedElement.split('</html>')[processedElement.split('</html>').length - 1].trim() || 'Sure.'
+
+                        if (messageText.includes('```')) {
+                            messageText = messageText.split('```')[1];
+                        }
+                        if (messageText.includes('<!--')) {
+                            messageText = messageText.split('<!--')[1].split('-->')[0];
+                        }
+                        messageText = messageText.replace('<', '\<');
+                        messageText = messageText.replace('>', '\>');
                         setMessages([...messages, { message: messageText, sentTime: "just now", sender: "Bot", direction: "incoming" }]);
                         dispatch({
                             type: MESSAGE_SENT,

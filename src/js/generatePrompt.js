@@ -54,7 +54,7 @@ async function generatePrompt(text) {
     const valueHtml = await getHtmlDb();
     const valueCss = await getCssDb();
     if (!valueHtml.trim().length && !valueCss.trim().length && !valueJavaScript.trim().length) {
-        return `$Given an empty web page: {text}. ${returnFormat}. Do not create elements dynamically using javascript. Add them to html part!. Avoid using onClick() events. Use event listeners  instead!`;
+        return `$Given an empty web page: {text}. ${returnFormat}. Do not create elements dynamically using javascript. Add them to html part!. Avoid using onClick() events. Use event listeners  instead! Wrap the code into three backtics and add a short comment after the code`;
     }
 
     let prompt = `<!DOCTYPE html>
@@ -87,7 +87,7 @@ async function generatePrompt(text) {
     prompt += `</html>
     `
     console.log(prompt);
-    return `${prompt} \n ${text}.${returnFormat}. Do not create or update elements dynamically using javascript. Add or change them them to html part! Do not use Onclick events. Use events listeners instead!`;
+    return `${prompt} \n ${text}.${returnFormat}. Do not create or update elements dynamically using javascript. Add or change them them to html part! Do not use Onclick events. Use events listeners instead! Wrap the code into three backtics and add a short comment after the code`;
 
 }
 
