@@ -1,4 +1,3 @@
-import { Configuration, OpenAIApi } from "openai";
 import { getHtmlDb, getCssDb, getJavaScriptDb } from './database';
 import axios from 'axios';
 
@@ -26,7 +25,12 @@ var returnFormat = `Return code in the following format
 
 </html>`
 
-
+/**
+ * Sends a request to the OpenAI API and returns the result.
+ * @param {Object} req The request object.
+ * @param {Object} res The response object.
+ * @returns {Promise<string>} The response from the OpenAI API.
+ */
 async function generate(req, res) {
 
     const prompt = await generatePrompt(req);
@@ -48,6 +52,11 @@ async function generate(req, res) {
         console.log(err);
     }
 }
+/**
+ * Generates a prompt based on the given text and database values.
+ * @param {string} text The text to include in the prompt.
+ * @returns {Promise<string>} The generated prompt.
+ */
 async function generatePrompt(text) {
 
     const valueJavaScript = await getJavaScriptDb();
@@ -78,15 +87,12 @@ async function generatePrompt(text) {
     if (valueHtml.trim().length) {
         prompt += `${valueHtml} \n`;
     }
-    prompt += `</div> 
-               </div>`
+    prompt += `</div>\n</div>`;
     if (valueJavaScript.trim().length) {
         prompt += ` <script> ${valueJavaScript} \n </script>`;
     }
-    prompt += `</body>`
-    prompt += `</html>
-    `
-    console.log(prompt);
+    prompt += `</body>\n</html>\n`;
+
     return `${prompt} \n ${text}.${returnFormat}. Do not create or update elements dynamically using javascript. Add or change them them to html part! Do not use Onclick events. Use events listeners instead! Wrap the code into three backtics and add a short comment after the code`;
 
 }
