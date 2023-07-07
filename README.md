@@ -8,7 +8,7 @@ Here's a preview of the result:
 
 ## Technology Used 
 
-[![My Skills](https://skillicons.dev/icons?i=js,css,nodejs,react,vscode)](https://skillicons.dev) 
+[![My Skills](https://skillicons.dev/icons?i=js,css,nodejs,react,vscode,redux)](https://skillicons.dev) 
 
 
 ## Requirement
